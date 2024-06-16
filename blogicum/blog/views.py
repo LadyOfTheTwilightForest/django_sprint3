@@ -26,6 +26,7 @@ def post_detail(request, id):
 
     context = {
         'post': post,
+        'location': post.location
     }
     # if id not in post_dict:
     #     raise Http404()
