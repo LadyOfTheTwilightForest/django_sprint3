@@ -28,8 +28,6 @@ def post_detail(request, id):
         'post': post,
         'location': post.location
     }
-    # if id not in post_dict:
-    #     raise Http404()
     return render(request, template, context)
 
 
