@@ -5,6 +5,7 @@ from django.utils import timezone
 
 from .models import Post, Category
 
+
 def index(request):
     template = 'blog/index.html'
     posts = Post.objects.filter(
@@ -21,7 +22,8 @@ def index(request):
 def post_detail(request, id):
     template = 'blog/detail.html'
     post = get_object_or_404(Post, id=id)
-    if post.pub_date > timezone.now() or not post.is_published or not post.category.is_published:
+    if post.pub_date > timezone.now() or not post.is_published or not \
+       post.category.is_published:
         raise Http404()
 
     context = {
@@ -31,13 +33,12 @@ def post_detail(request, id):
     return render(request, template, context)
 
 
-def category_posts(request, category_slug):
+def category_posts(request, slug):
     template = 'blog/category.html'
-    category = get_object_or_404(Category, category_slug=category_slug)
-
+    category = get_object_or_404(Category, slug=slug)
     if not category.is_published:
-        return Http404()
-    
+        raise Http404()
+
     posts = Post.objects.filter(
         pub_date__lte=timezone.now(),
         is_published=True,
@@ -49,7 +50,6 @@ def category_posts(request, category_slug):
         'post_list': posts,
     }
     return render(request, template, context=data)
-
 
 
 def page_not_found(request, exception):
