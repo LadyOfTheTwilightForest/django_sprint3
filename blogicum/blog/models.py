@@ -21,7 +21,7 @@ class Category(BaseModel):
         unique=True, blank = True, verbose_name = 'Идентификатор',
         help_text='Идентификатор страницы для URL; разрешены символы латиницы, цифры, дефис и подчёркивание.'
         )
-    empty_value_display = ''
+    # empty_value_display = ''
     
     class Meta:
         verbose_name = 'категория'
@@ -31,10 +31,6 @@ class Category(BaseModel):
         return self.title
 
 class Location(BaseModel):
-    is_published = models.BooleanField(
-        default=True, blank=True, verbose_name = 'Опубликовано',
-        help_text='Снимите галочку, чтобы скрыть публикацию.'
-    )
     name = models.CharField(max_length = 256, blank=True, verbose_name = 'Название места')
     class Meta:
         verbose_name = 'местоположение'
@@ -50,7 +46,7 @@ class Post(BaseModel):
         )
     author = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, verbose_name = 'Автор публикации')
     location = models.ForeignKey(Location, on_delete=models.SET_NULL, null=True, blank=False, verbose_name = 'Местоположение')
-    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True, verbose_name = 'Категория')
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=False, verbose_name = 'Категория')
 
     class Meta:
         verbose_name = 'публикация'

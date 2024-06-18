@@ -13,7 +13,7 @@ def index(request):
         category__is_published=True,
     ).order_by('-pub_date')[:5]
     context = {
-        'posts': posts,
+        'post_list': posts,
     }
     return render(request, template, context)
 
@@ -22,7 +22,7 @@ def post_detail(request, id):
     template = 'blog/detail.html'
     post = get_object_or_404(Post, id=id)
     if post.pub_date > timezone.now() or not post.is_published or not post.category.is_published:
-        return Http404()
+        raise Http404()
 
     context = {
         'post': post,
@@ -46,7 +46,7 @@ def category_posts(request, category_slug):
 
     data = {
         'category': category,
-        'posts': posts,
+        'post_list': posts,
     }
     return render(request, template, context=data)
 
