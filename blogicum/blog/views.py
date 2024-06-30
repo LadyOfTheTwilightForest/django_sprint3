@@ -1,4 +1,3 @@
-from django.db.models import Q
 from django.shortcuts import render, get_object_or_404
 
 from django.http import HttpResponseNotFound
@@ -8,17 +7,17 @@ from .models import Post, Category
 
 POSTS_PER_PAGE = 5
 
+TERMS_OF_PUBLICATION = Post.objects.filter(
+    pub_date__lte=timezone.now(),
+    is_published=True,
+    category__is_published=True,
+)
+
 
 def index(request):
     template = 'blog/index.html'
-    posts = Post.objects.filter(
-        pub_date__lte=timezone.now(),
-        is_published=True,
-        category__is_published=True,
-    ).prefetch_related(
+    posts = TERMS_OF_PUBLICATION.prefetch_related(
         'category', 'location'
-    ).order_by(
-        '-pub_date'
     )[:POSTS_PER_PAGE]
     context = {
         'post_list': posts,
@@ -29,11 +28,7 @@ def index(request):
 def post_detail(request, id):
     template = 'blog/detail.html'
     post = get_object_or_404(
-        Post.objects.filter(
-            Q(pub_date__lte=timezone.now())
-            & Q(is_published=True)
-            & Q(category__is_published=True),
-        ),
+        TERMS_OF_PUBLICATION,
         pk=id
     )
     context = {
@@ -55,7 +50,7 @@ def category_posts(request, slug):
         pub_date__lte=timezone.now(),
         is_published=True,
         category=category,
-    ).prefetch_related('category', 'location')
+    ).select_related('category', 'location', 'author')
 
     data = {
         'category': category,
