@@ -7,17 +7,19 @@ from .models import Post, Category
 
 POSTS_PER_PAGE = 5
 
-TERMS_OF_PUBLICATION = Post.objects.filter(
-    pub_date__lte=timezone.now(),
-    is_published=True,
-    category__is_published=True,
-)
+
+def get_published_posts():
+    return Post.objects.filter(
+        pub_date__lte=timezone.now(),
+        is_published=True,
+        category__is_published=True,
+    )
 
 
 def index(request):
     template = 'blog/index.html'
-    posts = TERMS_OF_PUBLICATION.prefetch_related(
-        'category', 'location'
+    posts = get_published_posts().select_related(
+        'category', 'location', 'author'
     )[:POSTS_PER_PAGE]
     context = {
         'post_list': posts,
@@ -28,7 +30,7 @@ def index(request):
 def post_detail(request, id):
     template = 'blog/detail.html'
     post = get_object_or_404(
-        TERMS_OF_PUBLICATION,
+        get_published_posts(),
         pk=id
     )
     context = {
